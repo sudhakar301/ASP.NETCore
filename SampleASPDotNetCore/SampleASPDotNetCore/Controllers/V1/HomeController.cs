@@ -26,6 +26,20 @@ namespace SampleASPDotNetCore.Controllers.V1
         {
              return Ok("string");
         }
+        /// <summary>
+        /// Added this for apply Rolebased Authorization. This will check if the user is having Admin role or not.
+        /// Authentication scheme is already added in the above method. So it will check for the token in the header and validate it.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getEmaildetails")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Policy ="Admin")]   
+        public IActionResult EmailDetails()
+        {
+            LoginModel user = new LoginModel();
+            var userEmailAddress = user.FetchUserDetails().Select(x=>x.EmailAddress).ToList();
+            return Ok(userEmailAddress);
+        }
 
         [Route("login")]
         [HttpPost]
@@ -50,7 +64,8 @@ namespace SampleASPDotNetCore.Controllers.V1
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
                 var claims = new[] {                               
-                                new Claim("UserID",userInfo.UserID)// these are the claims which will be visible in jwt.io so not passing sensitive data
+                                new Claim("UserID",userInfo.UserID),// these are the claims which will be visible in jwt.io so not passing sensitive data
+                                new Claim("custom_role", userInfo.Role),// these are the claims which will be visible in jwt.io so not passing sensitive data
                             };
 
                 var token = new JwtSecurityToken(_config["Jwt:Issuer"],
@@ -69,13 +84,11 @@ namespace SampleASPDotNetCore.Controllers.V1
         }
         private LoginModel AuthenticateUser(LoginModel login)
         {
-            LoginModel user = null;
+            LoginModel user = new LoginModel();
             
-            if (login.UserName == "string")
-            {
-                user = new LoginModel { UserName = "Sudhakar", EmailAddress = "sudhakar301@gmail.com",UserID="301472" };
-            }
-            return user;
+            return user.FetchUserDetails().FirstOrDefault(x=>x.UserName==login.UserName);
+            
+            
         }
     }
 }

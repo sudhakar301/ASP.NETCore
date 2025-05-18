@@ -7,7 +7,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)                      
   .AddJwtBearer(options =>
   {
       options.TokenValidationParameters = new TokenValidationParameters
@@ -40,10 +40,19 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddHttpContextAccessor();                                                              // Dependency Injection for IHttpContextAccessor
 builder.Services.AddScoped<IAuthorizationHandler, AuthorizationUserRequirementHandler>();               //Dependency Injection for AuthorizationUserRequirementHandler
-builder.Services.AddAuthorization(options => options.DefaultPolicy = new AuthorizationPolicyBuilder()   //Deafult policy added & addrequirements for AuthorizationUserRequirementHandler
-                .AddRequirements(new AuthorizationUserRequirement())
-                .Build()
-            );
+builder.Services.AddScoped<IAuthorizationHandler, RoleAuthorizationRequirementHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policyBuilder =>                                                        //Added Admin policy for Admin role
+    {
+        policyBuilder.AddRequirements(new RoleAuthorizationRequirement());
+    });
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()   //Deafult policy added & addrequirements for AuthorizationUserRequirementHandler
+               .AddRequirements(new AuthorizationUserRequirement())
+               .Build();
+           } );
+
+
 var app = builder.Build();
 
 app.UseSwagger();

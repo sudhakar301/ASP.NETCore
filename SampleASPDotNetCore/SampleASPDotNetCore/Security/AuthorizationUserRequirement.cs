@@ -30,12 +30,14 @@ namespace SampleASPDotNetCore.Security
 
             bool isAuthenticated = context.User.Identities.Any(x => x.IsAuthenticated);
             var userID = httpContext.User?.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+            
 
 
             if (isAuthenticated)
             {
-                context.Succeed(requirement);
+                context?.Succeed(requirement);
             }
+          
         }
     }
 }

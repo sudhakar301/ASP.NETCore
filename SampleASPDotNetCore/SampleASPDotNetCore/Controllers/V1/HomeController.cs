@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SampleASPDotNetCore.Model;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace SampleASPDotNetCore.Controllers.V1
@@ -20,10 +21,10 @@ namespace SampleASPDotNetCore.Controllers.V1
         }
         [HttpGet]
         [Route("item")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] //Based on this scheme it will check the token in the header and validate it
         public IActionResult Index()
         {
-            return Ok("string");
+             return Ok("string");
         }
 
         [Route("login")]
@@ -48,9 +49,13 @@ namespace SampleASPDotNetCore.Controllers.V1
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
+                var claims = new[] {                               
+                                new Claim("UserID",userInfo.UserID)// these are the claims which will be visible in jwt.io so not passing sensitive data
+                            };
+
                 var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                   _config["Jwt:Issuer"],
-                  null,
+                  claims,
                   expires: DateTime.Now.AddMinutes(120),
                   signingCredentials: credentials);
 
@@ -68,7 +73,7 @@ namespace SampleASPDotNetCore.Controllers.V1
             
             if (login.UserName == "string")
             {
-                user = new LoginModel { UserName = "Sudhakar", EmailAddress = "sudhakar301@gmail.com" };
+                user = new LoginModel { UserName = "Sudhakar", EmailAddress = "sudhakar301@gmail.com",UserID="301472" };
             }
             return user;
         }

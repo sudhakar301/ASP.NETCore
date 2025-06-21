@@ -51,10 +51,19 @@ builder.Services.AddAuthorization(options =>
                .AddRequirements(new AuthorizationUserRequirement())
                .Build();
            } );
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+                          policy =>
+                          {
+                              policy.AllowAnyHeader()
+                                    .AllowAnyMethod()
+                                    .WithOrigins("http://localhost:43200");
+                          });
+});
 
 var app = builder.Build();
-
+app.UseCors("CorsPolicy");
 app.UseSwagger();
 app.UseSwaggerUI(c =>
         {

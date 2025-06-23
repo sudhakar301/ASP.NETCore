@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SampleASPDotNetCore._MCommands;
+using SampleASPDotNetCore._MNotifications;
 using SampleASPDotNetCore._MQueries;
 using SampleASPDotNetCore.Data;
 
@@ -12,9 +13,11 @@ namespace SampleASPDotNetCore.Controllers.V1
     {
         private readonly IMediator _mediator;
         private readonly ISender _sender;
-        public MProductController(ISender sender)
+        private readonly IPublisher _publisher;
+        public MProductController(ISender sender, IPublisher publisher)
         {
             _sender = sender;
+            _publisher = publisher;
         }
         [HttpGet]
         public async Task<IActionResult> GetMProducts()
@@ -32,6 +35,7 @@ namespace SampleASPDotNetCore.Controllers.V1
         public async Task<IActionResult> AddMProduct([FromBody] MProduct product)
         {
              await _sender.Send(new AddMProductCommand(product));
+            await _publisher.Publish(new MProductAddedNotification(product));
             return StatusCode(201);
         }
     }

@@ -26,5 +26,10 @@
         {
             return await Task.FromResult(_products.SingleOrDefault(x=>x.Id==ID));
         }
+        public async Task EventOccured(MProduct product,string evnt)
+        {
+            _products.Single(x => x.Id == product.Id).Name = $"{product.Name} evnt: {evnt}";
+            await Task.CompletedTask;
+        }
     }
 }

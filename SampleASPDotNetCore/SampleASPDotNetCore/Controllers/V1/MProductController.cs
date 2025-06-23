@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SampleASPDotNetCore._MCommands;
 using SampleASPDotNetCore._MQueries;
+using SampleASPDotNetCore.Data;
 
 namespace SampleASPDotNetCore.Controllers.V1
 {
@@ -25,6 +27,12 @@ namespace SampleASPDotNetCore.Controllers.V1
         {
             var products = await _sender.Send(new GetMProductbyIDQuery(ID));
             return Ok(products);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddMProduct([FromBody] MProduct product)
+        {
+             await _sender.Send(new AddMProductCommand(product));
+            return StatusCode(201);
         }
     }
 }

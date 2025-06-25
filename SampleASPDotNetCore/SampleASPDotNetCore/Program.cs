@@ -1,7 +1,9 @@
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SampleASPDotNetCore._MBehaviors;
 using SampleASPDotNetCore.Data;
 using SampleASPDotNetCore.Security;
 using System.Text;
@@ -12,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(config=>config.RegisterServicesFromAssemblyContaining<Program>()); // Register MediatR services
 builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(Program).Assembly)); // Register MediatR services for the current assembly
 builder.Services.AddSingleton<MFakeDataStore>(); // Register the MFakeDataStore as a singleton service
+builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 # endregion
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)                      
   .AddJwtBearer(options =>

@@ -1,3 +1,4 @@
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,10 @@ builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(type
 builder.Services.AddSingleton<MFakeDataStore>(); // Register the MFakeDataStore as a singleton service
 builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 # endregion
+
+#region FluentValidation
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly); // Register all validators from the current assembly
+#endregion
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)                      
   .AddJwtBearer(options =>
   {

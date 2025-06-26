@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SampleASPDotNetCore;
 using SampleASPDotNetCore._MBehaviors;
 using SampleASPDotNetCore.Data;
 using SampleASPDotNetCore.Security;
@@ -15,11 +16,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(config=>config.RegisterServicesFromAssemblyContaining<Program>()); // Register MediatR services
 builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(Program).Assembly)); // Register MediatR services for the current assembly
 builder.Services.AddSingleton<MFakeDataStore>(); // Register the MFakeDataStore as a singleton service
-builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
 # endregion
 
 #region FluentValidation
+builder.Services.AddProblemDetails();
+// Register ProblemDetails for global error handling
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly); // Register all validators from the current assembly
+builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)); // Register the MValidationBehavior as a pipeline behavior for all requests
 #endregion
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)                      
   .AddJwtBearer(options =>
@@ -77,6 +83,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseExceptionHandler();
 app.UseCors("CorsPolicy");
 app.UseSwagger();
 app.UseSwaggerUI(c =>

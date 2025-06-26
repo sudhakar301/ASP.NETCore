@@ -25,7 +25,7 @@ namespace SampleASPDotNetCore.Controllers.V1
             var products = await _sender.Send(new GetMProductQuery());
             return Ok(products);
         }
-        [HttpGet("{ID}")]
+        [HttpGet("{ID}",Name = "GetMProductByID")]
         public async Task<IActionResult> GetMProductByID(int ID)
         {
             var products = await _sender.Send(new GetMProductbyIDQuery(ID));
@@ -34,9 +34,9 @@ namespace SampleASPDotNetCore.Controllers.V1
         [HttpPost]
         public async Task<IActionResult> AddMProduct([FromBody] MProduct product)
         {
-             await _sender.Send(new AddMProductCommand(product));
+           var result= await _sender.Send(new AddMProductCommand(product));
             await _publisher.Publish(new MProductAddedNotification(product));
-            return StatusCode(201);
+            return CreatedAtRoute("GetMProductByID",new {id=product.Id},result);
         }
     }
 }

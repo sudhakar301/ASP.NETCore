@@ -16,7 +16,7 @@ namespace SampleASPDotNetCore.Validators
             RuleFor(x=>x.Customer)
                 .NotNull()
                 .WithMessage("Customer is required")
-                .SetValidator(new CustomerInfoValidator());
+                .SetValidator(new CustomerInfoValidator()); 
             RuleFor(x => x.Items)
                 .NotEmpty()
                 .WithMessage("Order must contian at least one item");

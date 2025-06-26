@@ -4,7 +4,7 @@ using SampleASPDotNetCore.Data;
 
 namespace SampleASPDotNetCore._MHandlers
 {
-    public class AddMProductHandler : IRequestHandler<AddMProductCommand>
+    public class AddMProductHandler : IRequestHandler<AddMProductCommand,MProduct>
     {
         private readonly MFakeDataStore _dataStore;
 
@@ -12,9 +12,11 @@ namespace SampleASPDotNetCore._MHandlers
         {
             _dataStore = dataStore;
         }
-        public async Task Handle(AddMProductCommand request, CancellationToken cancellationToken)
+        public async Task<MProduct> Handle(AddMProductCommand request, CancellationToken cancellationToken)
         {
+
             await _dataStore.AddMProduct(request.mProduct);
+            return request.mProduct;
         }
     }
 }

@@ -3,6 +3,6 @@ using SampleASPDotNetCore.Data;
 
 namespace SampleASPDotNetCore._MCommands
 {
-    public record AddMProductCommand(MProduct mProduct) : IRequest; 
+    public record AddMProductCommand(MProduct mProduct) : IRequest<MProduct>; 
     
 }

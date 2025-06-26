@@ -24,8 +24,10 @@ builder.Services.AddProblemDetails();
 // Register ProblemDetails for global error handling
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly); // Register all validators from the current assembly
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)); // Register the MValidationBehavior as a pipeline behavior for all requests
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
 #endregion
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)                      
   .AddJwtBearer(options =>
